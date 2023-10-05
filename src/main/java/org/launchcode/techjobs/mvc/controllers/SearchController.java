@@ -23,24 +23,18 @@ public class SearchController {
     }
 
     // TODO #3 - Create a handler to process a search request and render the updated search view.
-    @PostMapping(value="results")
-    public String displaySearchResults(Model model, @RequestParam String searchType, @RequestParam (required = false) String searchTerm){
-        ArrayList<Job> jobs;
-        model.addAttribute("columns", columnChoices);
-
-        if (searchTerm.equals("all") || searchTerm.equals("") || searchTerm.equalsIgnoreCase("all")){
-            jobs= JobData.findAll();
-            model.addAttribute("title","All Jobs");
-        }if(searchTerm.equals("all") && searchTerm.equalsIgnoreCase("")){
-            jobs = JobData.findByColumnAndValue(searchType, searchTerm);
-            model.addAttribute("title", "Jobs with " + columnChoices.get(searchType) + ": " + searchTerm);
-        }else{
-            jobs=(JobData.findByColumnAndValue(searchType, searchTerm));
-            model.addAttribute("title", "Jobs with " + columnChoices.get(searchType) + ": " + searchTerm);
-
+    @PostMapping(value= "results")
+    public String displaySearchResults(Model model, @RequestParam String searchType, @RequestParam String searchTerm) {
+        if (searchType.equals("all") && (!(searchTerm.isEmpty())) && (!(searchTerm.equals("all")))) {
+            model.addAttribute("jobs", JobData.findByValue(searchTerm));
+            model.addAttribute("title", searchTerm);
+        } else if (searchType.equals("all") || searchTerm.isEmpty() || searchTerm.equals("all"))  {
+            model.addAttribute("jobs", JobData.findAll());
+            model.addAttribute("title", "All Jobs");
+        } else {
+            model.addAttribute("jobs", JobData.findByColumnAndValue(searchType, searchTerm));
+            model.addAttribute("title", searchTerm);
         }
-
-        model.addAttribute("jobs",jobs);
         model.addAttribute("columns", columnChoices);
         return "search";
     }
